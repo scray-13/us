@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ka" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ცი და ლევანი</title>
+
+    <!-- Google Fonts: Noto Serif Georgian & Noto Sans Georgian -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@300;400;500;600;700;800&family=Noto+Serif+Georgian:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        romantic: {
+                            50: '#fdf2f4',
+                            100: '#fce7eb',
+                            200: '#fbcfe8',
+                            300: '#f472b6',
+                            400: '#fb7185',
+                            500: '#e11d48',
+                            600: '#be123c',
+                            800: '#4c0519',
+                            900: '#2b030e',
+                            950: '#140106',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif Georgian"', 'serif'],
+                        sans: ['"Noto Sans Georgian"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome for minimal UI icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --font-serif: 'Noto Serif Georgian', serif;
+            --font-sans: 'Noto Sans Georgian', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            line-height: 1.9;
+            letter-spacing: -0.01em;
+        }
+
+        .georgian-serif {
+            font-family: var(--font-serif);
+        }
+
+        @keyframes floatSlow {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(1deg);
+            }
+        }
+
+        @keyframes pulseSoft {
+
+            0%,
+            100% {
+                opacity: 0.35;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.6;
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes waveAnimation {
+
+            0%,
+            100% {
+                height: 4px;
+            }
+
+            50% {
+                height: 16px;
+            }
+        }
+
+        .animate-float {
+            animation: floatSlow 6s ease-in-out infinite;
+        }
+
+        .pulse-ambient {
+            animation: pulseSoft 8s ease-in-out infinite;
+        }
+
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+        }
+
+        .glass-panel-hover {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-panel-hover:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border-color: rgba(244, 114, 182, 0.35);
+            box-shadow: 0 25px 60px rgba(225, 29, 72, 0.18);
+            transform: translateY(-4px);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 35px rgba(244, 114, 182, 0.5);
+        }
+
+        .music-bar {
+            width: 3px;
+            background: #f472b6;
+            border-radius: 9999px;
+            animation: waveAnimation 1.2s ease-in-out infinite;
+        }
+
+        .music-bar:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .music-bar:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .music-bar:nth-child(4) {
+            animation-delay: 0.1s;
+        }
+
+        .pause-animation .music-bar {
+            animation-play-state: paused;
+            height: 4px;
+        }
+
+        /* Floating background hearts */
+        .heart-float {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.22;
+            animation: floatUp 15s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) scale(0.6);
+                opacity: 0;
+            }
+
+            15% {
+                opacity: 0.28;
+            }
+
+            85% {
+                opacity: 0.28;
+            }
+
+            100% {
+                transform: translateY(-10vh) scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #090204;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4c0519;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #be123c;
+        }
+
+        /* 100% Reliable Inline Base64 Vector Emojis (No external file fetching) */
+        .em-tears {
+            display: inline-block;
+            width: 1.2em;
+            height: 1.2em;
+            vertical-align: -0.22em;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBhdGggZmlsbD0iI0ZGQ0M0RCIgZD0iTTM2IDE4YzAgOS45NDEtOC4wNTkgMTgtMTggMThTMCAyNy45NDEgMCAxOCA4LjA1OSAwIDE4IDBzMTggOC4wNTkgMTggMTgiLz48cGF0aCBmaWxsPSIjNjU0NzFCIiBkPSJNMTggMzFjLTUuNjI5IDAtNi44OTYtMy41MjctNi45NDctMy42NzhhMSAxIDAgMCAxIDEuODg5LS42NThDMTIuOTg3IDI2Ljc4MiAxMy44OTUgMjkgMTggMjljNC4xMjggMCA1LjAyMi0yLjI0MiA1LjA1OS0yLjMzNy4xOTMtLjUxLjc2My0uNzggMS4yNzYtLjU5NnMuNzg4LjczOS42MTIgMS4yNTVDMjQuODk2IDI3LjQ3MyAyMy42MjkgMzEgMTggMzF6TTI4Ljk5NCA4LjAxMUExLjAwNSAxLjAwNSAwIDAgMCAyOC4wMTEgN2MtLjA2Ny0uMDAxLTEuNjUzLS4wNTYtMy4zMDQtMS43MDdhLjk5OS45OTkgMCAxIDAtMS40MTQgMS40MTRDMjUuNTYgOC45NzQgMjcuOTAxIDkgMjggOWEuOTk1Ljk5NSAwIDAgMCAuOTk0LS45ODl6TTEyLjcwNyA2LjcwN2EuOTk5Ljk5OSAwIDEgMC0xLjQxNC0xLjQxNEM5LjY1MiA2LjkzNCA4LjA3NSA2Ljk5OCA3Ljk5IDdBMSAxIDAgMCAwIDggOWMuMDk5IDAgMi40NC0uMDI2IDQuNzA3LTIuMjkzeiIvPjxwYXRoIGZpbGw9IiNGRkYiIGQ9Ik0yOS44OTUgMTUuMDU4Yy0yLjE4Ni0zLjQyNi02LjA5NC00LjUzNi04LjE1Ny0zLjY1OS0xLjE0LjQ4My0xLjcxMSAyLjAyMi0xLjczNyA0LjY0Ny0uMDA2LjYxNi4wMTggMS4yOTQuMDcyIDIuMDMyLjAzMi40MzUuMDY3Ljg3Ni4xMTkgMS4zNTMuMTM0IDEuMjE5Ljc3NyAyLjE4MSAxLjg1OSAyLjc3OS43Mi4zOTkgMS41ODEuNjA0IDIuNDcxLjY2MSAxLjUyMy4wOTYgMy4xMzctLjI0NiA0LjI4MS0uNzk5IDEuMjEtLjU4NCAxLjk5Ni0xLjYzNiAyLjE1OC0yLjg4Ni4xNjItMS4yNDMtLjE4Ny0yLjc0OS0xLjA2Ni00LjEyOHoiLz48cGF0aCBmaWxsPSIjRjQ5MDBDIiBkPSJNMzAuOTYyIDE5LjE4NmMuMTYxLTEuMjQzLS4xODgtMi43NS0xLjA2Ny00LjEyOGE4Ljg1IDguODUgMCAwIDAtMS42MzEtMS44NzggNS45NTggNS45NTggMCAwIDAtMi43NjQtLjY4IDYuMDA1IDYuMDA1IDAgMCAwLTUuNDk4IDMuNjA2Yy0uMDA0LjYwMS4wMTggMS4yNTcuMDcxIDEuOTczLjAzMi40MzUuMDY3Ljg3Ni4xMiAxLjM1My4xMzQgMS4yMTkuNzc3IDIuMTgxIDEuODU5IDIuNzc5LjcyLjM5OSAxLjU4MS42MDQgMi40NzEuNjYxIDEuNTIzLjA5NiAzLjEzNy0uMjQ2IDQuMjgxLS43OTkgMS4yMS0uNTg1IDEuOTk2LTEuNjM2IDIuMTU4LTIuODg3eiIvPjxjaXJjbGUgZmlsbD0iIzY1NDcxQiIgY3g9IjI1LjUiIGN5PSIxOCIgcj0iNCIvPjxlbGxpcHNlIHRyYW5zZm9ybT0icm90YXRlKC00NS4wMjggMjQuNDk4IDE0Ljk5OSkiIGZpbGw9IiNGRkYiIGN4PSIyNC41IiBjeT0iMTUiIHJ4PSIxLjY3NCIgcnk9IjEuMzAzIi8+PHBhdGggZmlsbD0iIzVEQURFQyIgZD0iTTIxLjgxIDIyLjY0OGMuNzQ3LjQxNCAxLjY0OS42NTcgMi42ODIuNzIyLjE4Mi4wMTEuMzY1LjAxNy41NDkuMDE3IDEuMzkyIDAgMi44NDMtLjMxNSAzLjk4MS0uODY0Ljk3My0uNDcgMS42OTgtMS4yMTQgMi4xMDItMi4xMTdhLjU4NS41ODUgMCAwIDAtLjI1NC0uNzUzYy0xLjQyMS0uNzcxLTIuOTIxIDEuMzYyLTQuODcyIDEuMzYyLTEuOTUyIDAtNC4wNzQtLjkzNi01LjI1NiAwYS41MDYuNTA2IDAgMCAwLS4wNjUuNzI4Yy4zMDkuMzUzLjY4Ni42NTggMS4xMzMuOTA1eiIvPjxwYXRoIGZpbGw9IiNGRkYiIGQ9Ik02LjEwNSAxNS4wNThjMi4xODYtMy40MjYgNi4wOTQtNC41MzYgOC4xNTctMy42NTkgMS4xNC40ODMgMS43MTEgMi4wMjIgMS43MzcgNC42NDcuMDA2LjYxNi0uMDE4IDEuMjk0LS4wNzIgMi4wMzItLjAzMi40MzUtLjA2Ny44NzYtLjExOSAxLjM1My0uMTM0IDEuMjE5LS43NzcgMi4xODEtMS44NTkgMi43NzkuNzIuMzk5LTEuNTgxLjYwNC0yLjQ3MS42NjEtMS41MjMuMDk2LTMuMTM3LS4yNDYtNC4yODEtLjc5OS0xLjIxLS41ODQtMS45OTYtMS42MzYtMi4xNTgtMi44ODYtLjE2Mi0xLjI0My4xODctMi43NDkgMS4wNjYtNC4xMjh6Ii8+PHBhdGggZmlsbD0iI0Y0OTAwQyIgZD0iTTE1LjgwOCAxOS40MzJjLS4xMzQgMS4yMTktLjc3NyAyLjE4MS0xLjg1OSAyLjc3OS0uNzIuMzk5LTEuNTgxLjYwNC0yLjQ3MS42NjEtMS41MjMuMDk2LTMuMTM3LS4yNDYtNC4yODEtLjc5OS0xLjIxLS41ODQtMS45OTYtMS42MzYtMi4xNTgtMi44ODYtLjE2MS0xLjI0My4xODgtMi43NSAxLjA2Ny00LjEyOGE4Ljg1IDguODUgMCAwIDEgMS42MzEtMS44NzggNS45NTggNS45NTggMCAwIDEgMi43NjQtLjY4IDYuMDA1IDYuMDA1IDAgMCAxIDUuNDk4IDMuNjA2Yy4wMDQuNjAxLS4wMTggMS4yNTctLjA3MSAxLjk3M2E0MS4wNiA0MS4wNiAwIDAgMS0uMTIgMS4zNTJ6Ii8+PGNpcmNsZSBmaWxsPSIjNjU0NzFCIiBjeD0iMTAuNSIgY3k9IjE4IiByPSI0Ii8+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTEwLjk1NCAxNWMtLjIwMy44MjgtMS4wMTkgMS41LTEuODIyIDEuNS0uODAzIDAtMS4yODktLjY3Mi0xLjA4Ni0xLjVzMS4wMTktMS41IDEuODIyLTEuNWMuODAzIDAgMS4yODkuNjcyIDEuMDg2IDEuNXoiLz48cGF0aCBmaWxsPSIjNURBREVDIiBkPSJNMTQuMTkgMjIuNjQ4Yy0uNzQ3LjQxNC0xLjY0OS42NTctMi42ODIuNzIyYTkuMDk3IDkuMDk3IDAgMCAxLS41NDkuMDE3Yy0xLjM5MiAwLTIuODQzLS4zMTUtMy45ODEtLjg2NC0uOTczLS40Ny0xLjY5OC0xLjIxNC0yLjEwMi0yLjExN2EuNTg1LjU4NSAwIDAgMSAuMjU0LS43NTNjMS40MjEtLjc3MSAyLjkyMSAxLjM2MiA0Ljg3MiAxLjM2MiAxLjk1MiAwIDQuMDc0LS45MzYgNS4yNTYgMGEuNTA2LjUwNiAwIDAgMSAuMDY1LjcyOCA0LjE3OCA0LjE3OCAwIDAgMS0xLjEzMy45MDV6Ii8+PC9zdmc+');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0 0.1em;
+            line-height: 1;
+        }
+
+        .em-heart {
+            display: inline-block;
+            width: 1.2em;
+            height: 1.2em;
+            vertical-align: -0.22em;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0U2RTdFOCIgZD0iTTM1Ljg4NSAxMS44MzNjMC01LjQ1LTQuNDE4LTkuODY4LTkuODY3LTkuODY4LTMuMzA4IDAtNi4yMjcgMS42MzMtOC4wMTggNC4xMjktMS43OTEtMi40OTYtNC43MS00LjEyOS04LjAxNy00LjEyOS01LjQ1IDAtOS44NjggNC40MTctOS44NjggOS44NjggMCAuNzcyLjA5OCAxLjUyLjI2NiAyLjI0MUMxLjc1MSAyMi41ODcgMTEuMjE2IDMxLjU2OCAxOCAzNC4wMzRjNi43ODMtMi40NjYgMTYuMjQ5LTExLjQ0NyAxNy42MTctMTkuOTU5LjE3LS43MjEuMjY4LTEuNDY5LjI2OC0yLjI0MnoiLz48L3N2Zz4=');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0 0.1em;
+            line-height: 1;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-[#080204] text-rose-50/95 font-sans min-h-screen selection:bg-rose-500 selection:text-white relative overflow-x-hidden">
+
+    <!-- Ambient Glowing Light Orbs -->
+    <div
+        class="fixed top-0 left-1/4 w-[550px] h-[550px] bg-rose-600/15 rounded-full blur-[140px] pointer-events-none pulse-ambient">
+    </div>
+    <div class="fixed top-1/2 right-1/4 w-[600px] h-[600px] bg-pink-700/10 rounded-full blur-[160px] pointer-events-none pulse-ambient"
+        style="animation-delay: -3s;"></div>
+    <div class="fixed bottom-0 left-1/3 w-[550px] h-[550px] bg-purple-900/15 rounded-full blur-[140px] pointer-events-none pulse-ambient"
+        style="animation-delay: -5s;"></div>
+
+    <!-- Floating Background White Hearts -->
+    <div class="heart-float text-sm" style="left: 10%; animation-delay: 0s;"><span class="em-heart"></span></div>
+    <div class="heart-float text-base" style="left: 25%; animation-delay: 3s;"><span class="em-heart"></span></div>
+    <div class="heart-float text-xs" style="left: 45%; animation-delay: 7s;"><span class="em-heart"></span></div>
+    <div class="heart-float text-lg" style="left: 70%; animation-delay: 2s;"><span class="em-heart"></span></div>
+    <div class="heart-float text-sm" style="left: 85%; animation-delay: 5s;"><span class="em-heart"></span></div>
+    <div class="heart-float text-xs" style="left: 92%; animation-delay: 9s;"><span class="em-heart"></span></div>
+
+    <!-- Sticky Navigation / Header -->
+    <header
+        class="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-between items-center glass-panel border-b border-white/5 backdrop-blur-2xl">
+        <div class="flex items-center space-x-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-400 animate-pulse shadow-[0_0_10px_#f43f5e]"></span>
+            <span class="text-xs md:text-sm font-medium tracking-wider text-rose-200/90 georgian-serif">
+                ცი &amp; ლევანი <span class="em-heart"></span>
+            </span>
+        </div>
+
+        <!-- Music Button & Visualizer -->
+        <button id="musicToggle"
+            class="flex items-center space-x-3 px-4 py-2 rounded-full glass-panel glass-panel-hover text-xs font-medium text-rose-100 transition-all shadow-lg active:scale-95 border border-rose-500/20">
+            <div id="eqBars" class="flex items-end space-x-1 h-4">
+                <span class="music-bar"></span>
+                <span class="music-bar"></span>
+                <span class="music-bar"></span>
+                <span class="music-bar"></span>
+            </div>
+            <span id="musicText" class="georgian-serif">მუსიკა ჩართულია <span class="em-heart"></span></span>
+        </button>
+    </header>
+
+    <!-- Background Audio with Local MP3 and Direct Fallback -->
+    <audio id="bgAudio" src="romantic_piano.mp3" loop preload="auto" playsinline autoplay></audio>
+
+    <!-- Delicate Autoplay Hint if Browser Temporarily Pauses Initial Audio -->
+    <div id="autoplayNotice"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 px-5 py-2.5 rounded-full glass-panel border border-rose-400/30 text-rose-200 text-xs font-medium shadow-2xl opacity-0 pointer-events-none transition-all duration-500 flex items-center space-x-2">
+        <i class="fa-solid fa-volume-high text-rose-400 animate-pulse"></i>
+        <span class="georgian-serif">დააჭირე ეკრანზე ნებისმიერ ადგილას მუსიკის ასაჟღერებლად <span
+                class="em-tears"></span><span class="em-heart"></span></span>
+    </div>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 pt-28 pb-24 relative z-10 flex flex-col items-center">
+
+        <!-- HERO SECTION -->
+        <section class="w-full text-center py-10 md:py-16 flex flex-col items-center">
+
+            <div
+                class="inline-flex items-center space-x-2 px-5 py-2 rounded-full glass-panel text-rose-300 text-xs md:text-sm font-medium mb-8 animate-float border border-rose-500/20">
+                <span class="georgian-serif tracking-wide">ოფიციალურად ორი თვე ერთად <span class="em-tears"></span><span
+                        class="em-heart"></span></span>
+            </div>
+
+            <h1
+                class="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight mb-6 bg-gradient-to-r from-rose-100 via-pink-200 to-rose-400 bg-clip-text text-transparent georgian-serif text-glow">
+                ცი &amp; ლევანი
+            </h1>
+
+            <p
+                class="text-base sm:text-xl md:text-2xl text-rose-200/90 font-light max-w-2xl mx-auto mb-12 georgian-serif leading-relaxed">
+                ზოგჯერ წამი მთელ ცხოვრებას იტევს, ორი თვე კი — მარადისობას. დრო, რომელმაც ჩემს გულს თავისი ერთადერთი
+                სიყვარული აპოვნინა — შენ <span class="em-tears"></span><span class="em-heart"></span>
+            </p>
+
+            <!-- Live Elapsed Timer Box -->
+            <div
+                class="w-full max-w-3xl glass-panel p-6 sm:p-10 rounded-3xl border border-rose-500/20 shadow-2xl backdrop-blur-2xl">
+                <h2
+                    class="text-xs sm:text-sm uppercase tracking-widest text-rose-300/90 font-semibold mb-8 georgian-serif">
+                    დრო, მას შემდეგ რაც შენ ჩემი გახდი, მე კი შენი! <span class="em-heart"></span>
+                </h2>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="glass-panel p-5 rounded-2xl flex flex-col items-center border border-white/5">
+                        <span id="daysCount"
+                            class="text-4xl sm:text-5xl font-bold text-white mb-2 tracking-tight">00</span>
+                        <span
+                            class="text-xs text-rose-300/70 font-medium tracking-wider uppercase georgian-serif">დღე</span>
+                    </div>
+                    <div class="glass-panel p-5 rounded-2xl flex flex-col items-center border border-white/5">
+                        <span id="hoursCount"
+                            class="text-4xl sm:text-5xl font-bold text-white mb-2 tracking-tight">00</span>
+                        <span
+                            class="text-xs text-rose-300/70 font-medium tracking-wider uppercase georgian-serif">საათი</span>
+                    </div>
+                    <div class="glass-panel p-5 rounded-2xl flex flex-col items-center border border-white/5">
+                        <span id="minsCount"
+                            class="text-4xl sm:text-5xl font-bold text-white mb-2 tracking-tight">00</span>
+                        <span
+                            class="text-xs text-rose-300/70 font-medium tracking-wider uppercase georgian-serif">წუთი</span>
+                    </div>
+                    <div class="glass-panel p-5 rounded-2xl flex flex-col items-center border border-white/5">
+                        <span id="secsCount"
+                            class="text-4xl sm:text-5xl font-bold text-rose-400 mb-2 tracking-tight animate-pulse">00</span>
+                        <span
+                            class="text-xs text-rose-300/70 font-medium tracking-wider uppercase georgian-serif">წამი</span>
+                    </div>
+                </div>
+
+                <p class="text-xs sm:text-sm text-rose-200/80 mt-6 georgian-serif font-light">
+                    ყოველ წამს, ყოველ ამოსუნთქვასა და გულისცემას მხოლოდ შენთან მივყავარ... უსასრულოდ მიყვარხარ პატარავ
+                    <span class="em-tears"></span><span class="em-heart"></span>
+                </p>
+            </div>
+        </section>
+
+        <!-- THE LOVE LETTER SECTION (DEEPLY MOVING, EXTENSIVE, POETIC) -->
+        <section class="w-full my-12">
+            <div
+                class="glass-panel p-8 sm:p-14 md:p-16 rounded-3xl shadow-2xl relative overflow-hidden border border-rose-500/20">
+
+                <!-- Watermark Quote Icon in Background -->
+                <div
+                    class="absolute -right-8 -bottom-10 text-rose-500/[0.04] text-9xl md:text-[180px] pointer-events-none select-none">
+                    <i class="fa-solid fa-quote-right"></i>
+                </div>
+
+                <div class="flex items-center space-x-4 mb-8">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-300 text-lg shadow-inner">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                    </div>
+                    <div>
+                        <span
+                            class="text-xs uppercase tracking-widest text-rose-400 font-semibold georgian-serif">ლევანის
+                            აღიარება <span class="em-heart"></span></span>
+                        <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-white georgian-serif">
+                            წერილი ჩემს ერთადერთ სიყვარულს
+                        </h2>
+                    </div>
+                </div>
+
+                <article
+                    class="georgian-serif text-rose-100/90 text-base sm:text-lg leading-[2.15] sm:leading-[2.35] space-y-7 font-light">
+                    <p class="text-rose-200 font-normal text-lg sm:text-xl">
+                        „ჩემო ცი, ჩემო ერთადერთო სიყვარულო, ჩემო მომავალო...
+                    </p>
+
+                    <p>
+                        ხშირად ვზივარ მარტო, სიჩუმეში, შენს ფოტოს ვუყურებ და ვცდილობ გავიაზრო — ნეტავ როგორ ვცხოვრობდი
+                        შენამდე? როგორ იწყებოდა ჩემი დილა, რით ვავსებდი იმ უსაზღვრო სიცარიელეს, რომელიც თურმე მხოლოდ
+                        შენს გამოჩენას ელოდა? ახლა რომ ვუფიქრდები, თითქოს მთელი ჩემი წარსული მხოლოდ ნაცრისფერი მოლოდინი
+                        იყო იმისა, რასაც შენ მომიტანდი. შენ შემოხვედი ჩემს ცხოვრებაში და უბრალოდ ყველაფერი შეცვალე —
+                        ჩემი ფიქრები, ჩემი ხედვა და ისიც კი, თუ როგორ ვუყურებ ამ სამყაროს. შენ სიყვარულიც კი
+                        შემაყვარე...
+                    </p>
+
+                    <p>
+                        ორი თვე... ციფრებით თითქოს მხოლოდ სამოცი დღეა, მაგრამ ჩემთვის ამ ორმა თვემ მთელი ჩემი ცხოვრება
+                        თავდაყირა დააყენა და შიგნით უსასრულო სინათლე ჩააქსოვა. ეს არის სამოცი დღე, როცა პირველად
+                        ცხოვრებაში მივხვდი, რას ნიშნავს, როცა ვიღაც საკუთარ თავზე, საკუთარ სიცოცხლეზე, საკუთარ სუნთქვაზე
+                        მეტად გიყვარს.
+                        სამოცი დღე, როცა ყოველ დილით თვალის გახელა ერთი დიდი მადლიერებაა, რადგან ვიცი, რომ სადღაც, ამ
+                        სამყაროში ჩემი ცი იღვიძებს, ჩემზე ფიქრობს და ჩემს სიყვარულს გულში სათუთად ინახავს.
+                    </p>
+
+                    <p>
+                        იცი, რა არის ყველაზე მტკივნეული და ამავდროულად ყველაზე ჯადოსნური? ჩვენ შორის მანძილია...
+                        კილომეტრები, ქალაქები და ტელეფონის ეკრანი. ხანდახან ისე მინდა, უბრალოდ გვერდით
+                        მყავდე, შენს ხელს ჩემი თითები შევახო, შენი სათუთი თმა ყურს უკან გადაგიწიო და თვალებში ისე
+                        ჩაგხედო,
+                        რომ სიტყვები აღარ დაგვჭირდეს. ხანდახან ეს მონატრება ისე მიჭერს ყელში, რომ სუნთქვა მეკვრება...
+                        მაგრამ ამავე დროს, არასდროს, ჩემი არსებობის არცერთ წამს არ მიგრძვნია თავი ასე ახლოს, ასე
+                        განუყოფლად ვინმესთან.
+                    </p>
+
+                    <p>
+                        შენი ხმა... პირველად რომ გავიგონე, ჩემში რაღაც აუხსნელი, საოცრად თბილი სიმშვიდე დაიბადა. ყველაზე
+                        რთულ, ყველაზე დამღლელ და ცივ დღესაც კი, საკმარისია შენი ერთი „აუუუუ რააარი ლეევააან?“ გავიგონო,
+                        რომ
+                        მთელი ჩემი დაღლილობა უკვალოდ გაქრეს. შენი სიცილი — ეს ჩემი ყველაზე საყვარელი მელოდიაა ამქვეყნად.
+                        როცა შენ იცინი ჩემი სამყარო ჩერდება და შენს ბედნიერებას უსმენს. და შენი ჯადოსნური თვალები
+                        პატარავ... ყველაზე თბილი და ლამაზი თვალები გაქვს მთელს სამყაროში. შენამდე შენი თვალები
+                        შემიყვარდა და ჩემში ისეთი გრძნობა გამოიწვია, რასაც ვერასდროს ავხსნი...
+                    </p>
+
+                    <p>
+                        მახსენდება ჩვენი ღამეები. როცა მთელი ქალაქი იძინებს და ჩვენ ორნი ვრჩებით — ეკრანის იქით და აქეთ.
+                        საათობით მიმოწერა, დაუსრულებელი ზარები, როცა თენდება და ძილი არცერთს არ გვინდა, რადგან რეალობა
+                        ნებისმიერ სიზმარზე ტკბილი გახდა. ის წუთები, როცა დაღლილს გეძინება, ყურმილში მხოლოდ შენი მშვიდი,
+                        თანაბარი სუნთქვა ისმის და მე მეშინია გამოძრავებისაც კი, რომ ეს ლამაზი მელოდია არ დავარღვიო...
+                        ცი, იმ
+                        წამებში
+                        ვგრძნობ, რომ ჩემი სიცოცხლის აზრი შენ ხარ და მთელი არსებით მე მეკუთვნი.
+                    </p>
+
+                    <p>
+                        მადლობა შენ... მადლობა იმისთვის, რომ ხარ ზუსტად ისეთი, როგორიც ხარ — უსაზღვროდ თბილი, ბავშვურად
+                        წრფელი, საოცრად ერთგული და ნაზი. მადლობა, რომ შენი გულის კარი გამიღე, რომ მენდობი და მაძლევ
+                        ძალას, ვიყო ის კაცი, რომელიც შენს ყველა ცრემლს გააქრობს და მხოლოდ ღიმილს დაგიტოვებს სახეზე.
+                    </p>
+
+                    <p>
+                        მინდა მტკიცედ იცოდე: ეს მხოლოდ დასაწყისია. ეს ორი თვე ჩვენი უსასრულო გზის პირველი, ულამაზესი
+                        ნაბიჯია. მე არ მეშინია მანძილის, არ მეშინია ლოდინის, რადგან ვიცი, რა გველის წინ. მოუთმენლად ველი
+                        იმ წამს, როცა ერთმანეთს დავინახავთ... იმ წამს, როცა შენსკენ გამოვიქცევი,
+                        მთელი ძალით ჩაგიკრავ გულში და აღარასდროს, აღარასდროს გაგიშვებ.
+                    </p>
+
+                    <p class="text-rose-200 font-medium pt-2">
+                        მანამდე კი იცოდე: სადაც არ უნდა ვიყო, ჩემი გულის ყოველი ცემა, ჩემი ყოველი ფიქრი და ლოცვა მხოლოდ
+                        შენ გეკუთვნის. შენ ჩემი პირველი ხარ და ჩემი უკანასკნელი, ჩემი სიმშვიდე და ჩემი ყველაზე დიდი
+                        სიყვარული. მიყვარხარ უზომოდ, უსაზღვროდ, უკიდეგანოდ, უსასრულოდ, მთელი ჩემი გულითა და არსებით,
+                        მეყვარები სიცოცხლის ბოლომდე რაც არ უნდა მოხდეს, მეყვარები უკანასკნელ ამოსუნთქვამდე, მეყვარები
+                        იქამდე სანამ სიკვდილი არ დაგვაშორებს! <span class="em-tears"></span><span
+                            class="em-heart"></span>“
+                    </p>
+
+                    <div
+                        class="pt-6 border-t border-white/10 flex justify-between items-center text-sm text-rose-300/80">
+                        <span>სიყვარულით შენი,</span>
+                        <span class="text-base font-semibold text-rose-200">ლევანი <span class="em-heart"></span></span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- REDESIGNED "ჩვენი მომენტები" SECTION: 3 MINIMALIST LUXURY CARDS (ცი, ლევანი, ჩვენ) -->
+        <section class="w-full my-16">
+            <div class="text-center mb-12">
+                <div
+                    class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full glass-panel text-rose-300 text-xs font-semibold mb-4 border border-rose-500/20">
+                    <span class="georgian-serif">ჩვენ... <span class="em-heart"></span></span>
+                </div>
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 georgian-serif">
+                    გზა უსასრულობისკენ
+                </h2>
+                <p
+                    class="text-xs sm:text-sm text-rose-200/80 max-w-md mx-auto georgian-serif font-light leading-relaxed">
+                    სამი სიტყვა, რომელშიც მთელი ჩვენი სამყარო ეტევა <span class="em-tears"></span><span
+                        class="em-heart"></span>
+                </p>
+            </div>
+
+            <!-- 3 Minimalist Photo Showcase Cards: ცი, ლევანი, ჩვენ -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
+
+                <!-- 01: ცი -->
+                <div
+                    class="glass-panel rounded-3xl p-4 sm:p-5 glass-panel-hover border border-rose-500/20 flex flex-col group relative overflow-hidden">
+                    <div class="aspect-[3/4] rounded-2xl overflow-hidden relative shadow-2xl bg-black/50">
+                        <img src="moment1.jpg" alt="ცი"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                        <span
+                            class="absolute top-3.5 left-3.5 text-[11px] font-semibold text-rose-200/90 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10 georgian-serif tracking-wider">
+                            01
+                        </span>
+                    </div>
+                    <div class="pt-5 pb-2 text-center">
+                        <h3
+                            class="text-2xl sm:text-3xl font-bold text-white georgian-serif tracking-wide mb-1 group-hover:text-rose-200 transition-colors">
+                            ცი
+                        </h3>
+                        <p class="text-xs sm:text-sm text-rose-300/80 font-light georgian-serif">
+                            ჩემი ციცქნა <span class="em-heart"></span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 02: ლევანი -->
+                <div
+                    class="glass-panel rounded-3xl p-4 sm:p-5 glass-panel-hover border border-rose-500/20 flex flex-col group relative overflow-hidden">
+                    <div class="aspect-[3/4] rounded-2xl overflow-hidden relative shadow-2xl bg-black/50">
+                        <img src="moment2.jpg" alt="ლევანი"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                        <span
+                            class="absolute top-3.5 left-3.5 text-[11px] font-semibold text-rose-200/90 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10 georgian-serif tracking-wider">
+                            02
+                        </span>
+                    </div>
+                    <div class="pt-5 pb-2 text-center">
+                        <h3
+                            class="text-2xl sm:text-3xl font-bold text-white georgian-serif tracking-wide mb-1 group-hover:text-rose-200 transition-colors">
+                            ლევანი
+                        </h3>
+                        <p class="text-xs sm:text-sm text-rose-300/80 font-light georgian-serif">
+                            შენი პატარა <span class="em-heart"></span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 03: ჩვენ -->
+                <div
+                    class="glass-panel rounded-3xl p-4 sm:p-5 glass-panel-hover border border-rose-500/20 flex flex-col group relative overflow-hidden">
+                    <div class="aspect-[3/4] rounded-2xl overflow-hidden relative shadow-2xl bg-black/50">
+                        <img src="moment4.jpg" alt="ჩვენ"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                        <span
+                            class="absolute top-3.5 left-3.5 text-[11px] font-semibold text-rose-200/90 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10 georgian-serif tracking-wider">
+                            03
+                        </span>
+                    </div>
+                    <div class="pt-5 pb-2 text-center">
+                        <h3
+                            class="text-2xl sm:text-3xl font-bold text-white georgian-serif tracking-wide mb-1 group-hover:text-rose-200 transition-colors">
+                            ჩვენ
+                        </h3>
+                        <p class="text-xs sm:text-sm text-rose-300/80 font-light georgian-serif">
+                            ჩვენი სიყვარული <span class="em-tears"></span><span class="em-heart"></span>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECRET WISH SECTION -->
+        <section class="w-full my-12 text-center">
+            <div
+                class="glass-panel p-8 sm:p-12 rounded-3xl border border-rose-500/20 max-w-xl mx-auto shadow-2xl relative overflow-hidden">
+                <div
+                    class="w-14 h-14 rounded-full bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-300 text-xl mx-auto mb-6 shadow-inner animate-bounce">
+                    <i class="fa-solid fa-gift"></i>
+                </div>
+                <h3 class="text-2xl sm:text-3xl font-bold text-white mb-3 georgian-serif">
+                    გაინტერესებს რა მსურს ყველაზე მეტად? <span class="em-heart"></span>
+                </h3>
+                <p
+                    class="text-xs sm:text-sm text-rose-200/80 mb-8 georgian-serif max-w-md mx-auto leading-relaxed font-light">
+                    დააჭირე ქვემოთ მოცემულ ღილაკს და გაიგე, რა იმალება ჩემი გულის ყველაზე დაფარულ, სათუთ კუთხეში <span
+                        class="em-tears"></span><span class="em-heart"></span>
+                </p>
+                <button id="secretBtn"
+                    class="px-8 py-4 rounded-full bg-gradient-to-r from-rose-600 via-pink-600 to-rose-600 text-white font-semibold text-sm sm:text-base shadow-xl shadow-rose-900/50 hover:from-rose-500 hover:to-pink-500 transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center space-x-2 mx-auto border border-rose-400/30 georgian-serif">
+                    <span>საიდუმლო გზავნილი</span>
+                    <span class="em-tears"></span><span class="em-heart"></span>
+                </button>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer
+            class="w-full text-center py-8 text-xs sm:text-sm text-rose-300/50 border-t border-white/5 georgian-serif">
+            შექმნილია უსაზღვრო სიყვარულით ცი &amp; ლევანის 2 თვის იუბილისთვის <span class="em-tears"></span><span
+                class="em-heart"></span>
+        </footer>
+
+    </main>
+
+    <!-- SECRET MODAL POPUP (FULLY RESPONSIVE) -->
+    <div id="secretModal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/85 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-300 overflow-y-auto">
+        <div id="modalContent"
+            class="glass-panel max-w-lg w-full max-h-[90vh] flex flex-col p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-rose-500/40 transform scale-95 transition-all duration-300 relative shadow-[0_0_80px_rgba(225,29,72,0.3)] my-auto overflow-y-auto">
+            <button id="closeModal"
+                class="absolute top-3.5 right-3.5 sm:top-5 sm:right-5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-rose-200 transition-colors z-20">
+                <i class="fa-solid fa-xmark text-sm sm:text-base"></i>
+            </button>
+
+            <div class="text-center flex flex-col items-center">
+                <div
+                    class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-300 text-xl sm:text-2xl mb-3 sm:mb-5 shadow-lg shrink-0">
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+
+                <h3 class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4 georgian-serif">
+                    ჩემი ყველაზე დიდი სურვილი <span class="em-heart"></span>
+                </h3>
+
+                <div
+                    class="w-full text-rose-100/90 text-xs sm:text-sm md:text-base leading-relaxed mb-5 sm:mb-6 space-y-3 sm:space-y-4 georgian-serif text-left font-light bg-black/40 p-4 sm:p-6 rounded-2xl border border-white/5 overflow-y-auto max-h-[45vh] sm:max-h-[50vh]">
+                    <p>
+                        „ჩემო ცი, ჩემო ცხოვრების აზრო...
+                    </p>
+                    <p>
+                        თუკი ოდესმე მკითხავენ, რა არის ჩემი ყველაზე დიდი სურვილი ამ ქვეყანაზე, არცერთი წამით არ
+                        დავფიქრდები და პასუხად მხოლოდ შენს სახელს დავასახელებ.
+                    </p>
+                    <p>
+                        ჩემი ერთადერთი სურვილია, ყოველ დილით შენი თვალების დანახვა მახარებდეს, შენი ღიმილი მინათებდეს
+                        გზას და მთელი ცხოვრება მქონდეს საშუალება, გაგრძნობინო, რამდენად გამორჩეული, ძვირფასი და
+                        საყვარელი ხარ. მინდა დაგიცვა ყველა დარდისგან, მოგაშორო ყველა ცრემლი და გაჩუქო ისეთი ბედნიერება,
+                        როგორსაც მხოლოდ შენნაირი წმინდა სულის ადამიანი იმსახურებს.
+                    </p>
+                    <p>
+                        ვიცი, რომ მონატრება ხანდახან გაუსაძლისია, მაგრამ მინდა მტკიცედ გახსოვდეს: ყოველი წამი, რომელიც
+                        ჩვენს შეხვედრამდე რჩება, მხოლოდ იმისთვისაა, რომ ჩვენი პირველი ჩახუტება კიდევ უფრო დაუვიწყარი
+                        გახდეს.
+                    </p>
+                    <p class="font-normal text-rose-200">
+                        შენ ჩემი სულის სიმშვიდე ხარ, ჩემი ყველაზე ლამაზი რეალობა და ჩემი მარადისობა. ახლა კი, როცა ამ
+                        სიტყვებს კითხულობ, უბრალოდ გაიღიმე. <span class="em-tears"></span><span
+                            class="em-heart"></span>“
+                    </p>
+                </div>
+
+                <div
+                    class="w-full p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-rose-950/70 to-pink-950/70 text-rose-200 text-xs sm:text-sm font-medium border border-rose-500/30 georgian-serif flex items-center justify-center space-x-2 shrink-0">
+                    <span>შენს სიცოცხლეს გეფიცები სიგიჟემდე მიყვარხარ! </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. Live Countdown / Elapsed Timer since 2 months ago (exact 60 days)
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - 60);
+
+        function updateTimer() {
+            const now = new Date();
+            const diff = now - startDate;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('daysCount').innerText = String(days).padStart(2, '0');
+            document.getElementById('hoursCount').innerText = String(hours).padStart(2, '0');
+            document.getElementById('minsCount').innerText = String(minutes).padStart(2, '0');
+            document.getElementById('secsCount').innerText = String(seconds).padStart(2, '0');
+        }
+
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // 2. Audio Autoplay and State Management
+        const bgAudio = document.getElementById('bgAudio');
+        const musicToggle = document.getElementById('musicToggle');
+        const musicText = document.getElementById('musicText');
+        const eqBars = document.getElementById('eqBars');
+        const autoplayNotice = document.getElementById('autoplayNotice');
+        let isPlaying = false;
+        const cdnAudio = "https://dn711108.ca.archive.org/0/items/jamendo-526763/01-2043485-Carvine-Romantic%20Piano%20Inspirational.mp3";
+
+        function updateMusicUI(playing) {
+            isPlaying = playing;
+            if (playing) {
+                musicText.innerHTML = 'მუსიკა ჩართულია <span class="em-heart"></span>';
+                eqBars.classList.remove('opacity-40', 'pause-animation');
+                if (autoplayNotice) {
+                    autoplayNotice.classList.add('opacity-0', 'pointer-events-none');
+                }
+            } else {
+                musicText.innerHTML = 'მუსიკის ჩართვა <span class="em-heart"></span>';
+                eqBars.classList.add('opacity-40', 'pause-animation');
+            }
+        }
+
+        // Automatic failover if local file has decoding/path issues
+        bgAudio.addEventListener('error', () => {
+            if (bgAudio.src !== cdnAudio) {
+                console.warn("Local audio source issue detected, switching to direct CDN...");
+                bgAudio.src = cdnAudio;
+                bgAudio.load();
+                if (isPlaying) {
+                    bgAudio.play().catch(e => console.log(e));
+                }
+            }
+        });
+
+        function playMusic() {
+            bgAudio.volume = 0.85;
+            const playPromise = bgAudio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    updateMusicUI(true);
+                }).catch(err => {
+                    console.log("Audio waiting for user gesture:", err);
+                    updateMusicUI(false);
+                    if (autoplayNotice) {
+                        autoplayNotice.classList.remove('opacity-0', 'pointer-events-none');
+                    }
+                });
+            }
+        }
+
+        // Reliable User Gesture activation for modern browsers
+        const activationGestures = ['click', 'touchstart', 'pointerdown', 'mousedown', 'keydown'];
+        function handleUserGesture() {
+            if (bgAudio.paused) {
+                bgAudio.play().then(() => {
+                    updateMusicUI(true);
+                    // Remove listeners once successfully playing
+                    activationGestures.forEach(evt => {
+                        document.removeEventListener(evt, handleUserGesture);
+                    });
+                }).catch(err => {
+                    console.log("Gesture play attempt:", err);
+                });
+            }
+        }
+
+        activationGestures.forEach(evt => {
+            document.addEventListener(evt, handleUserGesture, { passive: true });
+        });
+
+        // Attempt playback immediately upon load
+        window.addEventListener('DOMContentLoaded', playMusic);
+        window.addEventListener('load', playMusic);
+        playMusic();
+
+        // Manual Toggle Button
+        musicToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (bgAudio.paused) {
+                bgAudio.play().then(() => {
+                    updateMusicUI(true);
+                }).catch(err => {
+                    console.log("Play failed, switching to CDN stream:", err);
+                    bgAudio.src = cdnAudio;
+                    bgAudio.load();
+                    bgAudio.play().then(() => updateMusicUI(true)).catch(e => console.error(e));
+                });
+            } else {
+                bgAudio.pause();
+                updateMusicUI(false);
+            }
+        });
+
+        // 3. Secret Modal Popup & Confetti
+        const secretBtn = document.getElementById('secretBtn');
+        const secretModal = document.getElementById('secretModal');
+        const modalContent = document.getElementById('modalContent');
+        const closeModal = document.getElementById('closeModal');
+
+        function openModal() {
+            secretModal.classList.remove('opacity-0', 'pointer-events-none');
+            modalContent.classList.remove('scale-95');
+            modalContent.classList.add('scale-100');
+
+            // Trigger soft romantic confetti (white, soft rose, champagne gold)
+            confetti({
+                particleCount: 80,
+                spread: 75,
+                origin: { y: 0.6 },
+                colors: ['#ffffff', '#f43f5e', '#fb7185', '#fda4af', '#fce7eb']
+            });
+        }
+
+        function closeModalFn() {
+            secretModal.classList.add('opacity-0', 'pointer-events-none');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+        }
+
+        secretBtn.addEventListener('click', openModal);
+        closeModal.addEventListener('click', closeModalFn);
+        secretModal.addEventListener('click', (e) => {
+            if (e.target === secretModal) {
+                closeModalFn();
+            }
+        });
+    </script>
+</body>
+
+</html>
